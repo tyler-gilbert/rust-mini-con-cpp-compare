@@ -1,0 +1,11 @@
+.reveal .slides p,
+.reveal .slides ul,
+.reveal .slides ol {
+  text-align: left;
+}
+
+.reveal .slides section > ul,
+.reveal .slides section > ol {
+  display: block;
+  margin-left: 1em;
+}

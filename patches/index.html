@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+		/>
+
+		<title>C++ vs. Rust</title>
+
+		<link rel="stylesheet" href="dist/reset.css" />
+		<link rel="stylesheet" href="dist/reveal.css" />
+		<link rel="stylesheet" href="dist/theme/black.css" />
+		<link rel="stylesheet" href="content/presentation.css" />
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="dist/plugin/highlight/monokai.css" />
+		<script type="module">
+			import "bootstrap-icons/font/bootstrap-icons.css";
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown="content/00-introduction.md"></section>
+				<section data-markdown="content/01-variables.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/02-procedural-programming.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/03-object-orient-programming.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/04-overriding-and-overloading.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/05-meta-programming.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/06-async-and-coroutines.md" data-separator-vertical="^\n--\n$"></section>
+				<section data-markdown="content/07-the-end.md" data-separator-vertical="^\n--\n$"></section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="dist/plugin/notes.js"></script>
+		<script src="dist/plugin/markdown.js"></script>
+		<script src="dist/plugin/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+			});
+		</script>
+	</body>
+</html>
