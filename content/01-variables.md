@@ -1,372 +1,418 @@
 ## Variables
 
-### ❌ Naming Conventions
+### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> Naming Conventions
 
-Rust specifies `snake_case` for variable and function names. It specifies `UpperCamelCase` for custom types and `UPPER_CASE` for constant values. The Rust compiler issues warnings if the case conventions are not followed. While most projects follow similar conventions, C++ does not specify case conventions.
+C++ does not prescribe style.
 
-
----
-
-### ✅ Primitive Types
-
-| C++ | Rust | Size (C++/Rust) | 
-|-----|------|------|
-| `size_t` | `isize` | cpu specific |
-| `ssize_t` | `usize` | cpu specific |
-| `uint8_t` | `u8` | 8-bit |
-| `int8_t` | `i8` | 8-bit |
-| `uint16_t` | `u16` | 16-bit |
-| `int16_t` | `i16` | 16-bit |
-| `uint32_t` | `u32` | 32-bit |
-| `int32_t` | `i32` | 32-bit |
-| `uint64_t` | `u64` | 64-bit |
-| `int64_t` | `i64` | 64-bit |
-| `uint128_t` | `u128` | 128-bit |
-| `int128_t` | `i128` | 128-bit |
-| `const char *` | `&str` | varies |
-| `float` | `f32` | 32-bit |
-| `double` | `f64` | 64-bit |
-| `bool` | `bool` | varies/1 Byte |
-| `char` | `char` | 8-bit/32-bit |
-
-
----
-
-#### ✅ Literals
-
-| C++ | Rust | Type | 
-|-----|------|------|
-| `5'000` | `5_000` | Decimal |
-| `0xff` | `0xff` | Hexadecimal |
-| `O777` | `0o777` | Octal |
-| `0b1111'0000` | `0b1111_0000` | Binary |
-| `'A'` | `'A'` | Byte |
-| `1.0f` | `1.0_f32` | single-precision floating point |
-| `1.0` | `1.0` | double-precision floating point |
-
-With Rust you can suffix a literal with an underscore-primitive type:
+Rust does.
 
 ```rust
-//rust
-let x = 5_u64;
+fn snake_case(){}
+struct MyTypeName {}
+let MY_CONSTANT_VALUE: i32 = 5;
 ```
-
 
 ---
 
-#### ❌ User-Defined Literals
+### <i class="bi bi-circle-fill" role="img" aria-label="Full overlap"></i> Primitive Types
 
-```c++
-//c++
-auto operator"" _milliseconds(unsigned long long int value) -> long long int {
+Fixed-width numeric types are very similar.
+
+```cpp
+std::size_t count = 5;
+std::ssize_t count = 5;
+```
+
+```rust
+let count: usize = 5;
+let count: isize = 5;
+```
+
+--
+
+#### Common Types
+
+| C++ / Rust | C++/Rust |
+|----------|--------------|
+| `int8_t` / `i8` |  `uint8_t` / `u8` |
+| `int16_t` / `i16` | `unt16_t` / `u16`  |
+| `int32_t` / `i32` |  `uint32_t` / `u32`  |
+| `int64_t` / `i64` | `uint64_t` / `u64` |
+| `int128_t`* / `i128` | `uint128_t`* / `u128` |
+| `ssize_t` / `isize` | `size_t` / `usize`  |
+| `float` / `f32`| `double` / `f64` |
+
+--
+
+#### Literal syntax
+
+| C++ | Rust |
+|-----|------|
+| `5'000` | `5_000` |
+| `0xff` | `0xff` |
+| `0777` | `0o777` |
+| `0b1111'0000` | `0b1111_0000` |
+| `1.0f` | `1.0_f32` |
+| `'A'` | `'A'` |
+
+--
+
+#### Literal Suffixes
+
+C++
+
+```cpp
+const auto x = 5ULL;
+const auto size = 5Z;
+```
+
+Rust
+
+```rust
+let x = 5_u64;
+let size = 5_usize;
+```
+
+--
+
+#### User-defined literals
+
+C++ supports user-defined literal suffixes:
+
+```cpp
+auto operator"" _milliseconds(unsigned long long value) -> long long {
   return value;
 }
 
 const auto value = 5_milliseconds;
 ```
 
-In Rust, you can have user-defined literals only within macros. Doing so is non-trivial but the call site could look something like this:
+Rust requires macros for a similar effect.
 
 ```rust
-//rust
-//can do this
-let duration = chrono!(5milliseconds);
-//can't do this
-let other_duration = 5milliseconds;
+let duration = chrono!(5 milliseconds);
+// A custom suffix such as this is not valid ordinary Rust syntax:
+// let duration = 5_milliseconds;
 ```
-
 
 ---
 
-### ❓ Compound Data Types
+### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Compound Data Types
 
-#### ❌ Enums
+C++ struct/class:
 
-```c++
-//c++
+```cpp
+struct Point { int x; int y; };
+class PointClass { int x; int y; }
+```
+
+Rust struct:
+
+```rust
+struct Point { pub x: i32, pub y: i32 }
+struct PointClass { x: i32, y: i32 }
+```
+
+--
+
+#### Enums and variants
+
+C++:
+
+```cpp
 enum class Color {
   red, green, blue
 };
 ```
 
+Rust:
+
 ```rust
-//rust
 enum Color {
   Red, Green, Blue
 }
 ```
 
-An `enum` in Rust can also be used similarly to `std::variant`.
+--
 
-```c++
-using Option = std::variant<bool, int>;
+C++ Variant:
 
-const auto option = Option{5};
-const auto nothing = Option{false};
+```cpp
+using Value = std::variant<bool, int>;
+
+Value option = 5;
+Value nothing = false;
 ```
 
+Rust Enum:
+
 ```rust
-//rust
-enum Option {
+enum Value {
   None,
-  Some(i32)
+  Some(i32),
 }
 
-//usage
-let option = Option::Some(5);
-let nothing = Option::None;
+let option = Value::Some(5);
+let nothing = Value::None;
 ```
 
-> Rust `std::Option` is used like C++'s `std::optional`. Some aspects of Rust `std::Option` are built into the language to streamline error handling using the `?` operator.
+--
 
+#### Arrays
 
----
-
-#### ❓ Arrays
-
-```c++
-//c++
-char x[5]; //may be uninitialized
-
-//access
-const auto z = x[0] + x[4]; //first and last
-const auto ub = x[5]; //undefined behavior
+```cpp
+// C++
+int x[5] = {1, 2, 3, 4, 5};
+const auto first_and_last = x[0] + x[4];
+const auto out_of_bounds = x[5]; // undefined behavior
 ```
 
 ```rust
-//rust
-let x: [i32; 5] = [1,2,3,4,5]; //must be initialized before 1st use
-let y = [3; 5]; //y is [3,3,3,3,3];
-
-//access
-let z = x[0] + x[4];
-let ub = x[5]; //won't compile 
-//if a dynamic out-of-range value is used, rust will panic at runtime
+// rust
+let x: [i32; 5] = [1, 2, 3, 4, 5];
+let repeated = [3; 5]; // [3, 3, 3, 3, 3]
+let first_and_last = x[0] + x[4];
+// let out_of_bounds = x[5]; // rejected for a constant index
 ```
 
+--
 
----
+#### Tuples and structs
 
-#### ❓ Tuples and Structs
 
-In Rust, tuples are a native type. In C++, they are part of `std::tuple`.
+C++ `std::tuple`:
 
-```c++
-//c++
-auto get_tuple() -> std::tuple<int, int>{
-  return std::tuple<int, int>{1, -1};
+```cpp
+// C++
+auto get_tuple() -> std::tuple<int, int> {
+  return {1, -1};
 }
 ```
 
+Rust tuples:
+
 ```rust
-//rust
+// rust
 fn get_tuple() -> (i32, i32) {
     (1, -1)
 }
 ```
 
-
 ---
 
-### ✅ Constness and Mutability
+### <i class="bi bi-circle-fill" role="img" aria-label="Full overlap"></i> Constness and Mutability
 
-C++ variables are mutable by default while Rust variables are constant by default.
+C++ variables are mutable by default; 
 
-```c++
-//c++
+```cpp
+// C++
 const int x = 5;
 int y = 10;
 ```
 
+Rust variables are immutable by default.
+
 ```rust
-//rust
+// rust
 let x: i32 = 5;
 let mut y: i32 = 10;
 ```
 
-In Rust, variables are dropped after the last use. This means a variable can be re-declared in the same scope. 
+---
 
-```rust
-//rust
-//this compiles and is valid rust
-let x = 10;
-let mut x = x; //x is now mutable
+### <i class="bi bi-circle-fill" role="img" aria-label="Full overlap"></i> `auto` vs. inference
+
+C++ uses `auto`.
+
+```cpp
+// C++
+auto count = 5;
 ```
 
+Rust infers binding type.
+
+```rust
+// rust
+let count = 5;
+```
+
+--
+
+#### Explicit vs Implicit types
+
+
+```cpp
+// C++
+const int w = 5; //explicit 
+const auto x = 5; //implicit 
+int y = 10; //explicit 
+auto z = 10; //implicit 
+```
+
+```rust
+// rust
+let w: i32 = 5; //explicit
+let x = 5; //implicit 
+let mut y: i32 = 10; //explicit 
+let mut z = 10; //implicit
+```
 
 ---
 
-### ✅ `auto` vs. inference
+### <i class="bi bi-circle-fill" role="img" aria-label="Full overlap"></i> Casting
 
-The `auto` keyword in C++ was introduced to enable backward compatible type inference. Rust comes with built-in type inference.
+C++ allows implicit conversions
 
-```c++
-//c++
-const int w = 5;
+```cpp
+double x = 1; // implicit conversion from int to double
+```
+
+Rust requires explicit conversions
+
+```rust
+let y = 1 as f64; // explicit cast
+```
+
+--
+
+#### Casting details
+
+C++ explicit casting:
+
+```cpp
+auto y = static_cast<double>(1);
+```
+
+A Rust type annotation != implicit cast:
+
+```rust
+// let x: f64 = 5; // does not compile
+let x: f64 = 5 as f64;
+```
+
+---
+
+### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> Copy and Move Semantics
+
+C++ => copy be default
+
+```cpp
+struct MyStruct { int x; };
+MyStruct my_struct_x{};
+MyStruct my_struct_y = my_struct_x; //copied
+```
+
+Rust => move by default
+
+```rust
+struct MyStruct { x: i32 };
+let my_struct_x = MyStruct{ x: 0 };
+MyStruct my_struct_y = my_struct_x; // moved
+```
+
+--
+
+#### Copying primitive values
+
+C++ primitive value copy.
+
+```cpp
+// C++
 const auto x = 5;
-int y = 10;
-auto z = 10;
+const auto y = x;
+std::printf("x%d\n", x);
+std::printf("y%d\n", y);
 ```
 
+Rust's primitive types implement `Copy` and `Clone`
+
 ```rust
-//rust
-let w: i32 = 5;
+// rust
 let x = 5;
-let mut y: i32 = 10;
-let mut z = 10;
-```
-
-
----
-
-### ✅ Casting
-
-C++ includes many implicit type-casts. In Rust, type-casting is always explicit.
-
-```c++
-//c++
-const double x = 1;  //implicit conversion from int to double
-const auto y = static_cast<double>(1); //C++11
-```
-
-> There are many ways to cast in C++. I can't cover them all here.
-
-```rust
-//rust
-let x: f64 = 5; //won't compile - no implicit conversion
-let y = 5 as f64; //cast using as
-```
-
-
----
-
-### ❌ Copy and Move Semantics
-
-Copy and move semantics between C++ and Rust concerning are very different. To summarize:
-
-- C++ copies variables by default. If a `class`/`struct` has implemented move semantics, the value is sometimes moved.
-- Rust moves (transfers ownership) by default. Custom types can implement `Copy` (implicit) and `Clone` (explicit) copy semantics.
-
-Rust primitive types implement `Copy` and `Clone` such that primitives are copied by default (just like in C++).
-
-```c++
-//c++
-const auto x = 5;
-const auto y = x; //y holds a copy of 5
-printf("x%d\n", x);
-printf("y%d\n", y);
-```
-
-```rust
-let x = 5;
-let y = x; //y holds a copy of 5
-//for these we assume `impl fmt::Display for X`
-println!("x{}", x); 
+let y = x;
+println!("x{}", x);
 println!("y{}", y);
 ```
 
-> See Also [References vs Borrowing](#references-vs-borrowing).
+--
 
+#### Moving compound values
 
----
+C++ move behavior is type specific
 
-#### ❌ Copying and Moving Compound Types
+```cpp
+#include <string>
+#include <utility>
 
-For non-primitives, C++'s default mode is to copy variables whereas Rust's default is to move (or transfer ownership).  For example:
-
-```c++
-//c++
-struct X {
-  int value;
-};
-auto x = X{5};
-auto y = std::move(x); //y holds a copy of x (default move is to copy)
-printf("x%d\n", x); //C++ specifies a valid but unspecified state for x
-printf("y%d\n", y);
+std::string x = "hello";
+auto y = std::move(x);
+// x is valid but its value is unspecified
 ```
+
+Assigning a Rust value transfers ownership. 
 
 ```rust
-struct X(i32);
-let x = X(5);
-let y = x; //y now owns '5' and x is now invalid
-//for these we assume `impl fmt::Display for X`
-println!("x{}", x); // This is a compiler error because x is moved
-println!("y{}", y);
+// rust
+let x = String::from("hello");
+let y = x; // x can no longer be used
 ```
 
-In Rust, you can override the default behavior by implementing `Clone` or `Copy` for a custom type. The mechanics are similar to custom move/copy assign/construct operators in C++.
+--
 
-```c++
+#### Custom copy behavior
+
+C++ copy/move constructors/assignment operators.
+
+```cpp
 struct X {
-  int value;
-  X(const X&a){
-    //magic here
-  }
-  X& operator=(const X&a){
-    //magic here
-    return *this;
-  }
-  X(const X&&a){
-    //magic here
-  }
-  X& operator=(const X&&a){
-    //magic here
-    return *this;
-  }
+  X(const X& other) { /* copy */ }
+  X(X&& other) { /* move */ }
 };
 ```
 
-```rust
-struct X(i32);
-impl Copy for X {
-  fn copy(self: &Self) -> Self {
-    //magic here
-  }
-}
-```
-
-> `self: &Self` can be written:
-> - `&self`: reading
-> - `mut self`: mutating
-> - `self`: consuming
-
-Or you can use the default `Copy`:
+ Rust `Clone`/`Copy` (traits)
 
 ```rust
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 struct X(i32);
+
 let x = X(5);
-let y = x; //y gets a copy of X
-//for these we assume `impl fmt::Display for X`
-println!("x{}", x); // This compiles now
-println!("y{}", y);
+let y = x; // copies X; x remains usable
+let y = x.clone(); // copy is implicit, clone is not
 ```
 
+--
 
----
+#### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> References vs Borrowing
 
-#### ❌ References vs Borrowing
+C++ references.
 
-C++ references and Rust borrows are very different but use similar syntax.
-
-```c++
-//c++
+```cpp
 auto x = 5;
-auto & y = x; //y refers to x
+auto& y = x;
 ```
 
-In C++, `y` is a pointer to `x`. If `x` changes, `y` will reflect that change. If `x` goes out of scope, `y` will be a dangling reference (undefined behavior).
-
+Rust borrows.
 
 ```rust
-//rust
-let mut x = 5;
-let y = &x; //y borrows x's value
-x = 10; //won't compile, because x is "borrowed"
-println!("y{}", y);
-x = 20; //will compile, borrow ends after last use
+let x = 5;
+let y = &x;
 ```
 
-In Rust, `&` is a borrow. The borrower takes ownership of the underlying data and limits what the original variable can do.
+They are not the same at all. [Read more in the Rust book](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html).
 
-> The above is a simplification of Rust ownership. [Read more in the Rust book](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html)
+--
+
+#### Borrowing and mutation
+
+Rust allows:
+- single mutable borrow OR
+- many non-mutable borrows
+
+```rust
+let mut x = 5;
+let y = &x;
+// x = 10; // rejected while y is used below
+println!("y{}", y);
+x = 20; // allowed after y's last use
+```

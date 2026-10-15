@@ -1,41 +1,35 @@
-## Object Orient Programming
+## Object-Oriented Programming
 
-### ❌ Classes and Structs
+### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> Classes and Structs
 
-> The primary difference between a C++ `class` and a `struct` is the `class` members are `private` by default and `struct` members are `public`. When comparing to Rust, we will just consider the C++ `struct`.
+C++ is object oriented.
 
-```c++
-//c++
-struct X {
-  int width;
-  int height;
-}; //trailing ;
-
-//or a tuple
-using T = std::tuple<int, int>;
+```cpp
+struct Point {
+  int x;
+  int y;
+};
 ```
+
+Rust is not (for the most part).
 
 ```rust
-//rust
-struct X {
-  width: i32,
-  height: i64, //this trailing comma is optional
-} //no trailing ;
-
-//struct can be a tuple
-struct T(i32, i64)
+struct Point {
+  x: i32,
+  y: i32,
+}
 ```
 
+--
 
----
+#### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Member functions and methods
 
-#### ❓ Member Functions/Methods
+C++ methods are declared inside a class or struct. 
 
-```c++
-//c++
+```cpp
 struct Foo {
   int value;
-  void set_value(int num){
+  void set_value(int num) {
     value = num;
   }
 };
@@ -44,238 +38,217 @@ auto foo = Foo{10};
 foo.set_value(5);
 ```
 
+--
+
+Rust uses an `impl` block.
+
 ```rust
-//rust
 struct Foo {
-  value: i32
+  value: i32,
 }
 
-//implementation is always separate from the data
-//with no forward declarations required
 impl Foo {
-  fn set_value(&mut self, num: i32){
+  fn set_value(&mut self, num: i32) {
     self.value = num;
   }
 }
 
-let mut foo = Foo{value: 10};
+let mut foo = Foo { value: 10 };
 foo.set_value(5);
 ```
 
+--
 
----
+#### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> Constructors
 
-#### ❌ Constructors
+C++ constructors/overloads/factory functions. 
 
-C++ gives a ton of flexibility in how to construct objects. Rust has exactly one way to construct an object. However, both languages support factory functions for combining logic with instantiation.
-
-```c++
-//c++
-struct X {
-  int width; //could assign defaults
+```cpp
+struct Size {
+  int width;
   int height;
-  X(int w, int h){ //could do an init-list here
-    //do some magic
+
+  Size(int w, int h) : width(w), height(h) {}
+  static Size create(int w, int h) { return Size(w, h); }
+};
+```
+
+--
+
+Rust has `new()` convention
+
+```rust
+struct Size {
+  width: i32,
+  height: i32,
+}
+impl Size {
+  fn new(width: i32, height: i32) -> Self {
+    Self { width: width, height: height }
+    // if member names match input names use:
+    // Self { width, height }
   }
-  //or with a factory function
-  static X create_x(int w, int h){
-    //do some magic
-    return X(w,h);
+}
+let direct = Size { width: 10, height: 20 };
+let via_factory = Size::create(5, 10);
+```
+
+--
+
+#### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Destructors and `Drop`
+
+C++ destructors
+
+```cpp
+struct X {
+  ~X() {
+    // release resources owned by X
   }
 };
 ```
 
-```rust
-//rust
-struct X {
-  width: i32,
-  height: i64, //this trailing comma is optional
-} //no trailing ;
-
-impl X {
-  fn create(w: i32, h: i64) -> Self {
-    //do some magic
-    //this is the ONLY way to officially construct X
-    return X{width: w, height: h};
-  }
-}
-
-//callsite
-let x0 = X{width:10, height:20};
-let x1 = X::create(5,10);
-```
-
-
----
-
-#### ❓ Destructors
-
-> ❓ C++ destructors have a lot more to worry about than Rust because of the way inheritance and copy/move semantics are implemented in C++.
-
-```c++
-//c++
-struct X {
-  int width; //could assign defaults
-  int height;
-  ~X(){
-    //called when the instance goes out of scope
-    //take care to properly handle copy/move semantics and inheritance
-  }
-
-};
-```
+Rust's `Drop` trait
 
 ```rust
-//rust
-struct X {
-  width: i32,
-  height: i32
-}
+struct X;
 
 impl Drop for X {
-  fn drop(&self){
-    //called when the instance is dropped
-    //only called once per value
-    //not called on borrow or ownership transfer
+  fn drop(&mut self) {
+    // release resources owned by X
   }
 }
 ```
 
+--
 
----
+#### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Access modifiers and visibility
 
-#### ❓ Access Modifiers
+C++ has `public`, `protected`, and `private`.
 
-```c++
-//c++
+```cpp
 struct Foo {
-public: //this is the default for struct
+public:
   int public_value;
 protected:
   int protected_value;
 private:
   int private_value;
-}
+};
 ```
+
+Rust has `pub`
 
 ```rust
-//rust
-struct Foo {
+pub struct Foo {
   pub public_value: i32,
-  //no equivalent for protected
-  private_value: i32
+  private_value: i32,
 }
 ```
 
-> In Rust, everything in the same module of the same crate can access private values. In C++, only the members of the same type can access private values.
+--
 
+### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Inheritance and Polymorphism
 
----
+C++ struct/class inheritance.
 
-#### ❌ Inheritance
+```cpp
+struct Bar : Foo {
+  int bar;
+};
+```
 
-```c++
+Rust has no inheritance.
+
+```rust
+struct Bar {
+  foo: Foo,
+  bar: i32,
+}
+```
+
+--
+
+#### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Inheritance and traits
+
+A C++ derived type inherits data and methods 
+
+```cpp
 struct Foo {
   int foo;
-  int get_foo() const {
-    return foo;
-  }
+  int get_foo() const { return foo; }
 };
 
-struct Bar : public Foo {
+struct Bar : Foo {
   int bar;
-  int get_bar() const {
-    return bar;
-  }
+  int get_bar() const { return bar; }
 };
 
-auto bar = Bar{};
-bar.get_foo();
-bar.get_bar();
+Bar value{};
+value.get_foo();
+value.get_bar();
 ```
 
-Rust uses "Traits" to define interfaces. A `struct` can implement multiple traits. "Traits" allow
-- constants
-- functions
-- types
+--
 
-They do not allow data members. To do approximately the above in Rust:
+Rust traits describe shared behavior
 
 ```rust
-//rust
-trait Foo {
-  fn get_foo() -> i32;
-}
-
-trait Bar {
-  fn get_bar() -> i32;
-}
-
+trait HasFoo { fn get_foo(&self) -> i32; }
+trait HasBar { fn get_bar(&self) -> i32; }
 struct FooBar {
   foo: i32,
-  bar: i32
+  bar: i32,
 }
-
-impl Foo for FooBar {
-  fn get_foo(&self) -> i32 {
-    return self.foo;
-  }
+impl HasFoo for FooBar { 
+    fn get_foo(&self) -> i32 { self.foo } 
 }
-
-impl Bar for FooBar {
-  fn get_bar(&self) -> i32 {
-    return self.bar;
-  }
+impl HasBar for FooBar { 
+    fn get_bar(&self) -> i32 { self.bar } 
 }
-
-let foobar = FooBar{foo: 5, bar: 10};
-let _foo = foobar.get_foo();
-let _bar = foobar.get_bar();
+let value = FooBar { foo: 5, bar: 10 };
+value.get_foo(); value.get_bar();
 ```
 
+--
 
----
+#### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Virtual functions and trait dispatch
 
-#### ❓ Virtual Functions
+C++ virtual functions use runtime dispatch (vtable)
 
-```c++
-//c++
+```cpp
 struct Foo {
-  virtual int pure_vitual() = 0;
-  virtual int virtual_with_default(){
-    return 0;
-  }
-}
+  virtual int pure_virtual() = 0;
+  virtual int with_default() { return 0; }
+  virtual ~Foo() = default;
+};
 
-struct Bar: public Foo {
-  int pure_virtual() override (){
-    return 1;
-  }
-  int virtual_with_default() override (){
-    return 1;
-  }
-}
+struct Bar : Foo {
+  int pure_virtual() override { return 1; }
+  int with_default() override { return 1; }
+};
+
+Bar bar;
+Foo& value = bar;
+value.pure_virtual();
 ```
 
+--
+
+Rust dynamic trait objects provide runtime dispatch.
 
 ```rust
-//rust
 trait Foo {
-  fn pure_virtual() -> i32;
-  fn virtual_with_default() -> i32 {
-    return 0;
-  }
+  fn pure_virtual(&self) -> i32;
+  fn with_default(&self) -> i32 { 0 }
 }
-
 struct Bar;
-
 impl Foo for Bar {
-  fn pure_virtual() -> i32 {
-    return 1;
-  }
-  //omit to use Foo's default implementation
-  fn virtual_with_default() -> i32 {
-    return 1;
-  }
+  fn pure_virtual(&self) -> i32 { 1 }
+  fn with_default(&self) -> i32 { 1 }
 }
+let bar = Bar;
+let value: &dyn Foo = &bar;
+value.pure_virtual();
 ```
+
+A Trait Object is the only part of Rust that is "Object" oriented.

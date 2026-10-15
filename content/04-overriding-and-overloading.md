@@ -1,105 +1,121 @@
 ## Overriding and Overloading
 
-C++ uses polymorphism more liberally than Rust.
+C++ supports overload sets and class-based virtual overriding. Rust uses distinct function names and traits for shared or dynamically dispatched behavior.
 
+--
 
----
+### <i class="bi bi-circle" role="img" aria-label="No overlap"></i> Function Overloading
 
-### ❌ Function Overloading
+C++ has function overloads.
 
-```c++
-//c++
-struct Foo {
-  int bar();
-  int bar() const; //unique by const
-  int bar(int value); //unique by parameter
-  int rbar() &&; //unique by rvalue
-  int rbar() &; //unique by lvalue
-};
+```cpp
+int parse(int value);
+double parse(double value);
 ```
+
+Rust does not.
 
 ```rust
-//rust
-impl Foo {
-  //functions can't be overloaded (need unique names)
-  fn bar(){}
-  fn bar_const(){}
-  fn bar_int(value: i32){}
-}
+fn parse_int(value: i32) -> i32 { value }
+fn parse_float(value: f64) -> f64 { value }
 ```
-
 
 ---
 
-### ✅ Operator Overloading
+### <i class="bi bi-circle-fill" role="img" aria-label="Full overlap"></i> Operator Overloading
+
+C++ operator overloads (define `operator`)
 
 ```c++
-//c++
+X sum = X{5, 5} + X{10, 10};
+```
+
+Rust operator overloads (`impl` traits)
+
+```rust
+let sum = X { width: 5, height: 5 } 
+    + X { width: 10, height: 10 };
+```
+
+--
+
+#### Implementing `operator+` / `Add`
+
+C++ defines `operator+` as a member here.
+
+```cpp
 struct X {
-  int width; //could assign defaults
+  int width;
   int height;
-  X operator+(const X & rhs) const {
-    return X{width+rhs.width, height+rhs.height};
+
+  X operator+(const X& rhs) const {
+    return X{width + rhs.width, height + rhs.height};
   }
-
 };
-
-//callsite
-const auto x = X{5,5} + X{10,10};
 ```
 
+--
+
+The equivalent Rust implementation uses `std::ops::Add` and specifies its output type:
+
 ```rust
-//rust
 struct X {
   width: i32,
-  height: i32
+  height: i32,
 }
 
 impl std::ops::Add for X {
-  fn add(&self, rhs: &X) -> Self {
-    return X{ width: self.width + rhs.width,
-      height: self.height + rhs.height};
+  type Output = Self;
+
+  fn add(self, rhs: Self) -> Self::Output {
+    Self {
+      width: self.width + rhs.width,
+      height: self.height + rhs.height,
+    }
   }
 }
-
-//callsite
-let x = X{width:5, height:5} + X{width:10, height:10};
 ```
-
 
 ---
 
-### ❓ Function Overriding
+### <i class="bi bi-circle-half" role="img" aria-label="Partial overlap"></i> Function Overriding
 
-```c++
-//c++
-struct Foo {
-  void do_something(){
-    printf("foo something\n");
-  }
-}
+C++ overrides a virtual base-class method.
 
-struct Bar: public Foo {
-  //overrides Foo's default implementation
-  void do_something(){
-    printf("bar something\n");
-  }
+```cpp
+struct Bar : Foo {
+  void do_something() override { /* ... */ }
+};
+```
+
+Rust replaces a trait's default method implementation.
+
+```rust
+impl Foo for Bar {
+  fn do_something(&self) { /* ... */ }
 }
 ```
 
-```rust
-//rust
-trait Foo {
-  fn do_something(&self){
-    println!("foo something");
-  }
-}
-struct Bar;
+--
 
-impl Foo for Bar {
-  //overrides Foo's default implementation
-  fn do_something(&self){
-      println!("bar something");
-  }
-}
+#### Runtime dispatch
+
+C++ 
+- virtual overrides for runtime dispath
+- template metaprogramming for static dispatch
+
+```cpp
+Bar bar;
+Foo& value = bar;
+value.do_something();
+```
+
+Rust 
+- trait objects (`dyn Foo`) for runtime dispatch
+- generics for static dispatch
+
+```rust
+let bar = Bar;
+let value: &dyn Foo = &bar;
+value.do_something();
 ```
